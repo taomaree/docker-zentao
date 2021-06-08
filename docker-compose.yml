@@ -1,0 +1,43 @@
+# docker-compose.yml
+version: '2.2'
+
+services:
+  zentao:
+    container_name: zentao
+    image: easysoft/zentao:15.0
+    mac_address: 02:42:ac:11:65:42
+    environment:
+      - NODE_ENV=production
+      - MYSQL_ROOT_PASSWORD=zentao
+      - MYSQL_URL=zentao-mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USERNAME=zentao
+      - MYSQL_PASSWD=zentao
+      - MYSQL_SCHEMA=zentao
+    #working_dir: /root
+    volumes:
+      - "/data/zentao/mariadata:/var/lib/mysql"
+      - "/data/zentao/zentaopms:/www/zentaopms"
+    ports:
+      - "8000:80"  # expose 38080
+      - "8001:3306"
+    links:
+    #   - redis
+       - mysql
+    depends_on:
+    #   - redis
+       - mysql
+  mysql:
+    container_name: zentao-mysql
+    image: mysql:8.0
+    ports:
+       - 8002:3306
+    volumes:
+        - "/data/zentao/mysql8data:/var/lib/mysql"
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --init-connect='SET NAMES utf8mb4;' --default-authentication-plugin=mysql_native_password --innodb-flush-log-at-trx-commit=0 
+    environment:
+        - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+        - MYSQL_DATABASE=zentao
+        - MYSQL_USER=zentao
+        - MYSQL_PASSWORD=zentao
+
